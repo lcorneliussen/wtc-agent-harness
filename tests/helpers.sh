@@ -164,6 +164,14 @@ mktemp_dir() {
 HARNESS_SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export HARNESS_SRC
 
+# The fixture registry (make_workspace) names the harness `agent-harness`, so
+# every tool the tests run as a subprocess must resolve harness_repo to that —
+# regardless of what this harness's own default is. Set here, at file level,
+# because make_workspace runs inside a command substitution and an export
+# there would never reach the test or the tools it launches.
+WTC_HARNESS_REPO=agent-harness
+export WTC_HARNESS_REPO
+
 # make_local_repo <path> [file] — a real git repo with one commit, no remote.
 # Used to seed .bare/ owners so nothing in the suite touches the network.
 make_local_repo() {
