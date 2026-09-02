@@ -19,11 +19,11 @@ harness_lib_init() {
   [ -f "$REGISTRY" ] || { echo "error: $REGISTRY missing" >&2; exit 1; }
 }
 
-# The collection folder is always `harness/`; the repo behind it is whatever
-# you named your fork of this one. Set WTC_HARNESS_REPO to that name — it has
-# to match the bare in `.bare/` and the `name:` in the registry.
+# The collection folder is always `harness/`; the repo behind it is this one,
+# wtc-agent-harness — the name of the bare in `.bare/` and the `name:` in the
+# registry. WTC_HARNESS_REPO overrides it if this harness is ever renamed.
 harness_repo() {
-  printf '%s\n' "${WTC_HARNESS_REPO:-agent-harness}"
+  printf '%s\n' "${WTC_HARNESS_REPO:-wtc-agent-harness}"
 }
 
 registry_field() { # <repo-name> <field> — one scalar field from the repo's block

@@ -1,0 +1,44 @@
+# Repo registry for the wtc-dogfood workspace — the worktree-collection
+# workspace in which wtc-agent-harness hosts itself.
+#
+# Tracked and authoritative. The generated local counterpart mapping each name
+# to its bare owner on this machine is `.harness-repos`, written by
+# tools/refresh-configs.sh (gitignored).
+#
+# Parsed with awk (tools/lib.sh), so the shape is load-bearing:
+#   * a repo block starts with a `- name: <repo>` line
+#   * every other field is `<key>: <value>` — one scalar, no inline comments
+#
+# Fields:
+#   remote         clone URL for the bare owner (always the forge, never a
+#                  local path — see instructions/worktree-workspace.md)
+#   default_ref    the development tip; detached worktrees rest here
+#   port_offset    added to the collection's port base to give the repo a
+#                  per-collection port (<REPO>_PORT in .env.collection).
+#                  Keep unique and stable — it is a contract between repos.
+#   issues_prefix  only for repos with an in-repo issue tracker. This
+#                  workspace tracks issues on GitHub, so no repo sets one.
+#   role           one line, for humans reading this file
+#
+# wtc-boilerplate — the upstream this harness is a downstream of — is
+# deliberately NOT listed. It joins a collection as an unmanaged `ext.`
+# sibling (instructions/worktree-workspace.md → Unmanaged siblings), owned by
+# an ordinary clone outside the workspace; generic fixes go back to it from
+# there.
+
+schema_version: 1
+
+repositories:
+  # This harness. Its worktree is always the collection's `harness/` dir.
+  - name: wtc-agent-harness
+    remote: git@github.com:lcorneliussen/wtc-agent-harness.git
+    default_ref: origin/main
+    role: Dogfood harness — instructions, registry, collection tools; downstream of wtc-boilerplate.
+
+  # The official Worktree Collections site. Serves HTTP once it has a stack,
+  # so it takes the first port offset: WTC_SITE_PORT = base + 1.
+  - name: wtc-site
+    remote: git@github.com:lcorneliussen/wtc-site.git
+    default_ref: origin/main
+    port_offset: 1
+    role: The official wtc site — the product this workspace exists to build.

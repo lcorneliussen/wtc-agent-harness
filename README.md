@@ -1,5 +1,15 @@
 # Worktree Collections — Multi-repo agent harness
 
+> **This is the dogfood harness.** `wtc-agent-harness` is a downstream of
+> [wtc-boilerplate](https://github.com/lcorneliussen/wtc-boilerplate) — the
+> reference implementation — set up the way the boilerplate tells every
+> project to set itself up: a registry of its own (`.harness-repos.yml`), a
+> harness `AGENTS.md`, and the one-line change that names this repo in
+> `tools/lib.sh`. Its product is [wtc-site](https://github.com/lcorneliussen/wtc-site),
+> the official site for the pattern. Generic fixes found here go back to the
+> boilerplate; the boilerplate rides along in each collection as an
+> unmanaged `ext.wtc-boilerplate` sibling for exactly that.
+
 A change worth making rarely fits in one repository. The API moves, the
 console follows, the mobile client catches up. Coding agents handle that
 badly for a dull reason: they are pointed at a single checkout, and the work
