@@ -126,7 +126,11 @@ Where it opens:
 | a terminal, including a herdr `shell` pane | this window |
 | a coding agent inside herdr | the `browse` pane (or `shell`, if the workspace is off-template), plus a sibling herdr tab `pr` running `gh dash` if that extension is installed |
 
-The browse nvim listens on `/tmp/wtc-browse-<collection>.nvim`. Status-pane
+The browse nvim listens on `/tmp/wtc-browse-<workspace>-<collection>.nvim`,
+where `<workspace>` is the basename of the workspace root — keyed by it too,
+because every workspace tends to have a `main` and one shared socket left the
+second workspace's browse pane unable to start. A pair too long for a socket
+path (104 bytes on macOS) is cut to fit and given a checksum. Status-pane
 clicks talk to it:
 
 | Click | Does |
@@ -204,6 +208,14 @@ A herdr agent is a separate full session with its own context and wtc. Start
 one only when the work is genuinely separate. **The prompt is ignition, not
 the record:** put the assignment in an issue, branch, or `HANDOFF.md` first and
 let the prompt point at it, so a dead agent costs nothing.
+
+The collection's own agent gets its ignition from `wtc-open.sh`: on a
+collection whose `HANDOFF.md` is still present it submits `/wtc-start` the
+moment the agent is ready, and does not take the send on trust — a slash
+command typed into Claude opens its command palette, where the first Enter
+completes the command instead of sending it, so the text can sit in the chat
+entry looking submitted. wtc-open waits for the agent to be seen working and
+supplies the missing Enter when herdr reports the submission stalled.
 
 ```bash
 tools/branch-off.sh --issue api-1234 paging-clamp --open

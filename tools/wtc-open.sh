@@ -48,6 +48,11 @@ removes it along with the collection.
                     on claude.ai, named for the collection. Start-time only —
                     a session started without it cannot be attached later
   --no-agent        create the panes but start no agent
+  --no-first-prompt start the agent but do not hand it its first prompt.
+                    On a fresh collection (HANDOFF.md still present) the
+                    agent is otherwise told to run /wtc-start as soon as it
+                    is ready, and the submission is checked — the agent has
+                    to be seen working on it, not just holding the text
   --no-status       leave the status pane at a shell prompt (it is otherwise
                     (re)started whenever that pane is idle)
   --no-browse       leave the browse pane at a shell prompt. By default it
@@ -63,6 +68,7 @@ EOF
 
 all=no list=no dry_run=no session="" agent_kind="" agent_kind_set=no start_agent=yes focus=no
 agent_args="" agent_args_set=no remote_control=yes start_browse=yes start_status=yes
+first_prompt=yes
 while [ $# -gt 0 ]; do
   case "$1" in
     --all) all=yes; shift ;;
@@ -73,6 +79,7 @@ while [ $# -gt 0 ]; do
     --no-remote-control) remote_control=no; shift ;;
     --dry-run) dry_run=yes; shift ;;
     --no-agent) start_agent=no; shift ;;
+    --no-first-prompt) first_prompt=no; shift ;;
     --no-browse) start_browse=no; shift ;;
     --no-status) start_status=no; shift ;;
     --focus) focus=yes; shift ;;
@@ -89,6 +96,11 @@ harness_lib_init
 
 herdr_present || { echo "error: herdr is not installed (see instructions/herdr.md)" >&2; exit 1; }
 [ -n "$session" ] || session="$(herdr_session_name)"
+
+# Ceiling, in seconds, on waiting for a freshly created pane to reach its
+# prompt. Polled rather than slept: a pane that settles in a second costs a
+# second, and only a pane that never settles costs the whole budget.
+PANE_SETTLE=10
 
 # Machine defaults from the control root; flags still win (instructions/secrets.md).
 load_wtc_config
@@ -291,19 +303,39 @@ open_collection() { # <collection>
     if [ -n "$shell_pane" ]; then
       herdr --session "$session" pane rename "$shell_pane" shell >/dev/null
     fi
-    settle=2   # a pane created a moment ago has not reached its prompt
+    settle=$PANE_SETTLE   # its panes have not reached their prompts yet
     note "workspace created"
   fi
 
   # browse / status — added to workspaces opened before they existed. Panes
   # that are already there are untouched.
   if [ "$dry_run" = no ]; then
-    herdr_ensure_browse_pane "$session" "$ws_id" "$dir" >/dev/null || true
+    had_browse="$(herdr_pane_id_by_label "$session" "$ws_id" browse)"
+    fresh="$(herdr_ensure_browse_pane "$session" "$ws_id" "$dir" || true)"
+    # Only a pane this call just made needs settling. An existing browse pane
+    # is quite likely running nvim, and waiting on that would spend the whole
+    # budget to learn what one look already says.
+    if [ -z "$had_browse" ] && [ -n "$fresh" ]; then
+      herdr_pane_wait_idle "$session" "$fresh" "$PANE_SETTLE" || true
+    fi
     if [ "$start_status" = yes ] \
        && [ -z "$(herdr_pane_id_by_label "$session" "$ws_id" status)" ]; then
-      ensure_status_pane "$ws_id" "$dir" >/dev/null || true
-      settle=2
+      fresh="$(ensure_status_pane "$ws_id" "$dir" || true)"
+      [ -z "$fresh" ] || herdr_pane_wait_idle "$session" "$fresh" "$PANE_SETTLE" || true
     fi
+  fi
+
+  # A workspace created a moment ago has four panes still running their shell
+  # rc, and herdr reports that rc's own commands as each pane's foreground
+  # process. Reading the rows now is a coin flip per pane, and a pane that
+  # comes up busy is "left alone" — the agent never starts, browse never
+  # opens, and re-running wtc-open is the only way back. So wait for the
+  # prompts before looking; nothing runs in a workspace this young, so every
+  # pane is expected to hold one. Afterwards the panes are settled and the
+  # per-pane budgets below have nothing left to wait for.
+  if [ "$settle" != 0 ]; then
+    herdr_ws_wait_idle "$session" "$ws_id" "$settle"
+    settle=0
   fi
 
   rows="$(herdr_pane_rows "$session" "$ws_id")"
@@ -314,16 +346,29 @@ open_collection() { # <collection>
   if [ "$start_agent" = no ]; then
     note "agent skipped"
   else
+    # shellcheck disable=SC2086  # state_label takes the split words on purpose
     case "${st%% *}" in
       missing) note "agent no pane" ;;
-      # shellcheck disable=SC2086
       agent)   note "agent live ($(state_label $st))" ;;
       running) note "agent busy (${st#running }) — left alone" ;;
       *)
+        # A collection that still has its launch note has not been started:
+        # the agent's first move is /wtc-start, and nobody should have to
+        # type it into the pane. Only on this path — an agent that is
+        # already live keeps whatever it is doing.
+        want_first=no
+        [ "$first_prompt" = yes ] && [ -f "$dir/HANDOFF.md" ] && want_first=yes
         if [ "$dry_run" = yes ]; then
           note "agent empty → would start $agent_kind"
+          [ "$want_first" = no ] || note "would submit $(first_prompt_text)"
         elif start_agent_in_pane; then
-          note "agent started ($agent_kind)"
+          if [ "$want_first" = no ]; then
+            note "agent started ($agent_kind)"
+          elif first_prompt_in_pane; then
+            note "agent started ($agent_kind), $(first_prompt_text) running"
+          else
+            note "agent started ($agent_kind) — first prompt not taken, type it"
+          fi
         else
           note "agent start failed"
         fi
@@ -389,7 +434,7 @@ open_collection() { # <collection>
         else
           # --repos is the pane's intent (the process table is its own pane);
           # the interval, click and scope come from wtc-status itself now.
-          status_cmd='./harness/tools/wtc-status.sh --repos'
+          status_cmd='./harness/tools/wtc-status-tui.sh'
           if herdr_pane_run_idle "$session" "$(herdr_row_col "$rows" status 2)" \
                "$status_cmd" "$settle"; then
             note "status started"
@@ -441,6 +486,41 @@ start_agent_in_pane() {
     sleep 1
   done
   return 0
+}
+
+# What a fresh collection's agent is told first. Claude runs the skill by its
+# slash name; other kinds get the same thing in words, since their skill
+# surfaces differ and the words are enough to make the right one fire.
+first_prompt_text() {
+  case "$agent_kind" in
+    claude) printf '%s' "/wtc-start" ;;
+    *) printf '%s' "Run the wtc-start skill (harness/skills/wtc-start/SKILL.md): read HANDOFF.md at the collection root, then start." ;;
+  esac
+}
+
+# Hand the agent its first prompt and do not trust the send. Typing a slash
+# command into Claude opens its command palette, and there the first Enter
+# completes the command rather than sending it — so the text can sit in the
+# chat entry looking submitted while the agent stays idle. herdr's prompt
+# surface does add an Enter, but the only proof is the agent going to work:
+# wait for exactly that, and when herdr reports the submission stalled, the
+# palette has eaten the Enter and one more is what is owed.
+#
+# Addressed by pane id, not agent name: a name only refers to the pane's
+# occupant while the agent herdr started is still there, and the pane is
+# what this call just started it in (instructions/herdr.md).
+first_prompt_in_pane() { # -> 0 once the agent is working on it
+  _fp="$(first_prompt_text)"
+  _out="$(herdr --session "$session" agent prompt "$agent_pane" "$_fp" \
+            --wait --until working --timeout 20000 2>&1)" && return 0
+  case "$_out" in
+    *agent_prompt_stalled*)
+      herdr --session "$session" agent send-keys "$agent_pane" enter >/dev/null 2>&1 || return 1
+      herdr --session "$session" agent wait "$agent_pane" \
+        --until working --timeout 10000 >/dev/null 2>&1
+      ;;
+    *) return 1 ;;
+  esac
 }
 
 for c in $collections; do
