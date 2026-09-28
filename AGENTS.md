@@ -43,6 +43,9 @@ The authoritative list is `.harness-repos.yml`. The workspace root is
   make sense in any workspace, it is a wtc-boilerplate PR made from
   `ext.wtc-boilerplate`, then a port here. Say so in the commit that ports
   it (`port: wtc-boilerplate#<n>`).
+- **Upstream is public.** Before any write to wtc-boilerplate — issue, PR,
+  comment, commit — read `instructions/publication-privacy.md` and check the
+  exact payload. Name no private consumer, this workspace included.
 - **Specific → here.** The registry, this file, the site's own hooks.
 - **Ports are by hand.** The bare has no `upstream` remote; the `ext.`
   sibling's history is how upstream commits are reached. Cherry-pick or
@@ -95,5 +98,5 @@ put the GitHub issue link in `WTC-SCOPE.md` and the PR body.
 
 The `wtc-*` skills in `skills/` are the recurring collection procedures —
 `/wtc-start`, `/wtc-status`, `/wtc-new`, `/wtc-add-repo`, `/wtc-catch-up`,
-`/wtc-pr`, `/wtc-draft-pr`, `/wtc-browse`, `/wtc-retire`. They are linked
+`/wtc-pr`, `/wtc-draft-pr`, `/wtc-follow`, `/wtc-browse`, `/wtc-retire`. They are linked
 into every collection root by `link-skills.sh`. Prefer one over ad hoc shell.
