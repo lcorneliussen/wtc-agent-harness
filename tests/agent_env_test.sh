@@ -14,6 +14,24 @@ mkdir -p "$collection"
 cp -R "$ws/main/harness" "$collection/harness"
 agent_env="$collection/harness/tools/agent-env.sh"
 
+# A released CLI should receive the compatibility entry point's arguments.
+native_bin="$(mktemp_dir native-bin)"
+native_log="$native_bin/calls"
+cat > "$native_bin/wtc" <<'MOCK'
+#!/usr/bin/env bash
+printf 'PWD=%s %s\n' "$PWD" "$*" >> "$WTC_FAKE_LOG"
+case "$*" in
+  'agent-env --help') exit 0 ;;
+  *) printf 'WTC_AGENT_ENV=1; export WTC_AGENT_ENV\n' ;;
+esac
+MOCK
+chmod +x "$native_bin/wtc"
+it "the compatibility entry point dispatches to native agent-env"
+out="$(PATH="$native_bin:$PATH" WTC_FAKE_LOG="$native_log" "$agent_env" --print-path)"
+assert_contains "$out" "WTC_AGENT_ENV=1"
+assert_contains "$(cat "$native_log")" "agent-env --collection $collection --print-path"
+assert_contains "$(cat "$native_log")" "PWD=$collection agent-env --collection $collection --print-path"
+
 # A toolchain prefix that exists on disk but is nothing like a real PATH, so
 # an assertion cannot pass by accident on the developer's own environment.
 fake_bin="$(mktemp_dir bins)"
@@ -87,6 +105,12 @@ out="$(env -i HOME="$HOME" PATH=/usr/bin:/bin \
       CLAUDE_PROJECT_DIR="$collection" BASH_ENV="$agent_env" \
       /bin/bash -c 'echo "$PATH"' </dev/null)"
 assert_contains "$out" "$fake_bin/alpha"
+
+it "BASH_ENV leaves shell options and scratch names alone"
+out="$(env -i HOME="$HOME" PATH=/usr/bin:/bin \
+      CLAUDE_PROJECT_DIR="$collection" BASH_ENV="$agent_env" \
+      /bin/bash -c 'case $- in *u*) echo NOUNSET ;; *) echo CLEAN ;; esac; declare -F find_collection_root >/dev/null && echo LEAKED || true; echo "${collection-unset}"' </dev/null)"
+assert_eq $'CLEAN\nunset' "$out"
 
 # --- PATH hygiene -----------------------------------------------------------
 
