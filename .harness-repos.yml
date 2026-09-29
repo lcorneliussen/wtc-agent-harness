@@ -42,3 +42,20 @@ repositories:
     default_ref: origin/main
     port_offset: 1
     role: The official wtc site — the product this workspace exists to build.
+
+  # Public boilerplate for a team OpenClaw server. Downstream derived works
+  # copy it and port upstream changes by hand, like this harness does with
+  # wtc-boilerplate.
+  - name: clawfather-boilerplate
+    remote: git@github.com:lcorneliussen/clawfather-boilerplate.git
+    default_ref: origin/main
+    role: Public boilerplate for a team OpenClaw server — per-provider hosting, extension points, upgrade and backport flows.
+
+  # Private derived work of clawfather-boilerplate, run locally with Docker
+  # Compose. The test bed for the boilerplate and for wtc integration. Serves
+  # the gateway locally: WTC_CLAW_PORT = base + 2.
+  - name: wtc-claw
+    remote: git@github.com:lcorneliussen/wtc-claw.git
+    default_ref: origin/main
+    port_offset: 2
+    role: Private Docker Compose claw derived from clawfather-boilerplate — test bed and wtc integration.
