@@ -57,7 +57,7 @@ assert_contains "$env_body" "WIDGET_PORT=42001"
 it "mise.toml points at the collection env"
 assert_file "$c/mise.toml"
 assert_contains "$(cat "$c/mise.toml")" ".env.collection"
-assert_contains "$(cat "$c/mise.toml")" '"github:lcorneliussen/wtc-cli" = "0.1.2"'
+assert_contains "$(cat "$c/mise.toml")" '"github:lcorneliussen/wtc-cli" = "0.1.3"'
 
 it "the agent entry point and the scope note are seeded"
 assert_file "$c/AGENTS.md" "collection AGENTS.md"
