@@ -65,6 +65,9 @@ assert_contains "$sweep_out" '=== beta' 'older target included in sweep'
 assert_contains "$sweep_out" 'already-current=' 'older target completed shell setup'
 
 it 'catch-up refreshes the target pin before skill setup'
+# Exercise the shell bootstrap path; this test's CLI mock only implements
+# skill rendering and would otherwise intercept native catch-up.
+printf '0.1.14\n' > "$root/main/harness/.wtc-cli-version"
 mkdir -p "$root/gamma"
 add_fixture_worktree "$root" agent-harness "$root/gamma/harness"
 printf '[tools]\n"github:lcorneliussen/wtc-cli" = "0.1.7"\n' > "$root/gamma/mise.toml"
@@ -72,7 +75,8 @@ printf '[tools]\n"github:lcorneliussen/wtc-cli" = "0.1.7"\n' > "$root/gamma/mise
 "$root/main/harness/tools/catch-up.sh" --harness-only --no-secrets --no-mcp gamma \
   > "$root/catch-up.out" 2> "$root/catch-up.err"
 assert_eq 0 "$?" 'catch-up succeeded'
-assert_contains "$(cat "$root/gamma/mise.toml")" '"github:lcorneliussen/wtc-cli" = "0.1.14"' \
+pin="$(cat "$root/gamma/harness/.wtc-cli-version")"
+assert_contains "$(cat "$root/gamma/mise.toml")" "\"github:lcorneliussen/wtc-cli\" = \"$pin\"" \
   'generated pin refreshed'
 assert_contains "$(cat "$SKILLS_TEST_CALLS")" \
   "$root/gamma|skills render --collection $root/gamma" 'native render used refreshed pin'
