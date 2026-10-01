@@ -98,32 +98,29 @@ overrides, `--no-agent` skips the agent.
 
 ## Status
 
-`tools/wtc-status.sh` prints each collection's branch, open PR with its check
-rollup (`✓ ✗ ● —`), and working-tree state, then the processes running under
-the session with CPU and memory.
+The status pane runs `tools/wtc-status-tui.sh`, which dispatches to the pinned
+`wtc status --tui`. It shows worktree branches, PR checks and reviews, and
+working-tree state. The process view is available through `wtc status --procs`.
 
 The opener puts a `status` pane in every wtc, scoped to that collection —
 including wtcs opened before the pane existed, so re-running adds it without
-disturbing the agent. For the process view, run it wherever you want it:
+disturbing the agent. For a separate view, run:
 
 ```bash
-tools/wtc-status.sh --procs --watch 5
-tools/wtc-status.sh --repos --watch 120   # all collections at once
+wtc status --procs
+wtc status --all                   # all collections, explicitly
 ```
 
-The collection table is **clickable** wherever it has a terminal on both
-ends (`--no-click` turns that off, `--click` forces it on):
+The TUI starts with the last snapshot and shows the collector step while a
+new one loads. Click “refreshing” or press `l` for the refresh log, which
+includes failed ref fetches. `r` refreshes, `a` toggles archived PRs, `?`
+shows help, and `q` quits. A one-shot `wtc status` logs elapsed steps in an
+interactive terminal; `--silent` suppresses them. Active PR details use a
+90-second forge cache, and merged PR details can be reused for 24 hours.
 
-| Click | Does |
-|---|---|
-| the `REPO` cell | focuses that sibling in the browse nvim (vim tab + neo-tree) |
-| the `PR` cell | `:Octo pr edit` in that tab, or the pull request in the browser |
-| the `TREE` cell | neo-tree git status in that tab; `lazygit` in a `diff:<repo>` herdr tab if nvim is not up |
-
-`r` redraws, `q` quits. Clickable cells are underlined. The pane captures
-the mouse while it runs, so herdr's own selection and wheel scrolling in that
-pane give way to the table — close the diff tabs yourself when done; the
-status pane never closes anything.
+When a build provider supplies `T` or `P` cells, clicking one opens its build
+URL. `--no-click` disables build URL clicks. The status pane captures the mouse
+while it runs, so herdr's selection and scrolling give way to the TUI.
 
 ## Browse
 
@@ -148,23 +145,12 @@ Where it opens:
 
 The browse nvim listens on
 `/tmp/wtc-browse-<workspace-basename>-<collection>.nvim`. Long names are
-shortened and checksummed to fit the platform socket-path limit. Status-pane
-clicks talk to it:
-
-| Click | Does |
-|---|---|
-| `REPO` | switch to that sibling's vim tab |
-| `TREE` | that tab, neo-tree git status (lazygit tab if nvim is down) |
-| `PR` | `:Octo pr edit` in that tab, else the PR in the browser |
+shortened and checksummed to fit the platform socket-path limit.
 
 ```bash
 tools/wtc-browse.sh              # this collection
 tools/wtc-browse.sh --here       # this terminal, even from an agent pane
 ```
-
-A status pane opened before clicking existed keeps running the old command
-(nothing here restarts a live pane). Re-run the command in that pane when you
-want it, or open a new wtc.
 
 For an interactive look at what the agents are actually running, bind a
 process monitor to a popup — full screen, closes on exit, layout untouched:
