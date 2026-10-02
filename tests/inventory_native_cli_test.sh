@@ -130,10 +130,14 @@ for group in ('secrets', 'env'):
                     break
                 chunks.append(part)
                 if interactive and not quit_sent and b'q quit' in b''.join(chunks):
-                    for _ in range(row_count[group] - 1):
+                    for selected in range(2, row_count[group] + 1):
                         os.write(master, b'j')
-                        assert select.select([master], [], [], 1)[0], 'missing navigation redraw'
-                        chunks.append(os.read(master, 65536))
+                        frame = bytearray()
+                        marker = f'{selected}/'.encode()
+                        while marker not in frame:
+                            assert select.select([master], [], [], 1)[0], (group, selected, row_count[group], repr(frame[-200:]))
+                            frame.extend(os.read(master, 65536))
+                        chunks.append(bytes(frame))
                     os.write(master, b'q')
                     quit_sent = True
             assert proc.wait(timeout=5) == 0, (group, flags)
@@ -143,6 +147,8 @@ for group in ('secrets', 'env'):
                 proc.wait()
             os.close(master)
         output = b''.join(chunks)
+        label = b'widget/.env' if group == 'secrets' else b'MACHINE_KEY'
+        assert label in output, (group, flags, 'missing fixture label')
         assert (b'\x1b[?1049h' in output) == interactive, (group, flags)
         if interactive:
             assert_fits(output, 42)
