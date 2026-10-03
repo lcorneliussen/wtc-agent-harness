@@ -131,13 +131,13 @@ gh pr create --base <working-branch> --fill --title "<issue-id>: <what changed>"
 
 ```bash
 gh pr view --json number --jq .number   # the number gh just created
-tools/wtc-pr.sh enlist <repo> <n> --branch <working-branch>
+wtc pr enlist <repo> <n> --branch <working-branch>
 ```
 
 This is how `wtc-catch-up` and `wtc-status` find this PR later — a local
 mapping in `<collection>/.wtc-prs`, not a forge label.
 It survives everything a label would, for the one thing that actually matters
-here: this collection's own tools reading it back. `tools/wtc-pr.sh list`
+here: this collection's own tools reading it back. `wtc pr list`
 shows what is currently enlisted. Keep merged PRs enlisted while main checks
 or required delivery steps remain; returning the worktree to the tip does not
 end those obligations. Recent merged rows can age into the status archive.
@@ -156,17 +156,20 @@ gh pr edit <n> --add-label "wtc:$WTC_COLLECTION"
 
 If enlisting fails for some reason, **open the PR anyway** and say so. A PR
 missing from local bookkeeping is a smaller problem than a PR that was never
-opened — `tools/wtc-pr.sh enlist` afterwards fixes it.
+opened — `wtc pr enlist` afterwards fixes it.
 
 ### 5.2 Ready for review
 
 ```bash
-gh pr ready <n>                       # if it exists as a draft
+wtc review ready <n>      # if it exists as a draft
 gh pr edit <n> --add-reviewer <who>   # only if the repo doesn't auto-assign
 ```
 
 Marking ready is what summons reviewers and the review bots. Do it only when
 the change is genuinely reviewable — otherwise this is a `wtc-draft-pr` job.
+`wtc review ready` opens the gate only when a current local review has passed
+(`/wtc-local-review`). A raw `gh pr ready` or `bb pr ready` is refused by
+`hooks/guard-pr-ready.py`.
 
 ## 6. Follow it
 
@@ -277,7 +280,7 @@ query($owner:String!,$name:String!,$num:Int!){
   reviewThreads(first:50){nodes{id isResolved isOutdated path line
    comments(first:10){nodes{databaseId author{login} body}}}}}}}' \
  --jq '.data.repository.pullRequest.reviewThreads.nodes[]
-       | select(.isResolved | not) | "\(.path):\(.line) [\(.comments.nodes[0].author.login)]"'
+       | select(.isResolved | not) | "\(.id) \(.path):\(.line) [\(.comments.nodes[0].author.login)]"'
 ```
 
 For each unresolved comment, do **both** halves — a change without an answer
