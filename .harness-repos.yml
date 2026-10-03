@@ -3,9 +3,9 @@
 #
 # Tracked and authoritative. The generated local counterpart mapping each name
 # to its bare owner on this machine is `.harness-repos`, written by
-# tools/refresh-configs.sh (gitignored).
+# `wtc registry refresh` (gitignored).
 #
-# Parsed with awk (tools/lib.sh), so the shape is load-bearing:
+# Parsed by the CLI, so the shape is load-bearing:
 #   * a repo block starts with a `- name: <repo>` line
 #   * every other field is `<key>: <value>` — one scalar, no inline comments
 #
