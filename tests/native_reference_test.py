@@ -25,7 +25,7 @@ required = {
 assert required <= commands, sorted(required - commands)
 
 add_repo_help = subprocess.check_output(["wtc", "add-repo", "--help"], text=True)
-assert "wtc add-repo <repo> [repo ...]" in add_repo_help, add_repo_help
+assert "wtc add-repo <repo|clone-url|path> [...]" in add_repo_help, add_repo_help
 assert "--collection string" in add_repo_help, add_repo_help
 for relative in ("skills/wtc-add-repo/SKILL.md", "instructions/worktree-workspace.md"):
     guidance = (root / relative).read_text()
