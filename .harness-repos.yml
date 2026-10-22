@@ -41,7 +41,14 @@ repositories:
     remote: git@github.com:lcorneliussen/wtc-site.git
     default_ref: origin/main
     port_offset: 1
-    role: The official wtc site — the product this workspace exists to build.
+    role: The official wtc site — the product this workspace exists to build; what it says about wtc comes from wtc-cli.
+
+  # The wtc CLI and its OpenClaw plugin: the product the site describes. Its
+  # docs/ are the source of truth for commands and behaviour.
+  - name: wtc-cli
+    remote: git@github.com:lcorneliussen/wtc-cli.git
+    default_ref: origin/main
+    role: The wtc CLI and OpenClaw plugin — what the site describes; its docs/ are the source of truth.
 
   # Public boilerplate for a team OpenClaw server. Downstream derived works
   # copy it and port upstream changes by hand, like this harness does with
