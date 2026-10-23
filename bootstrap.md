@@ -61,7 +61,6 @@ whichever product repos you will add).
 | Tool | Used by |
 |---|---|
 | **lazygit** | Optional terminal Git status and diff view |
-| **gh-dash** (`gh extension install dlvhdr/gh-dash`) | `pr` herdr tab next to browse |
 | **octo.nvim** | PR editing inside browse nvim |
 | **unified.nvim** | Inline (Zed-style) overlay when browse opens a real file |
 | **diffview.nvim** | Side-by-side from browse (`<leader>gD`) |

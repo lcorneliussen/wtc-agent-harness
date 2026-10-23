@@ -2,8 +2,10 @@
 
 The recurring collection actions are packaged as **skills**: `SKILL.md`
 procedure files the agent CLIs discover on their own and load only when a task
-matches. They live in this repo under `skills/`, and are exposed at each
-collection root by symlink.
+matches. The generic `wtc-*` skills ship with the pinned CLI and render into
+the collection's `.wtc/skills/`. A harness override, when one is added, lives
+in this repo under `skills/` and replaces the default of the same name. Either
+way the skill is exposed at each collection root by symlink.
 
 Design principle, as everywhere else here: **no tool is load-bearing.** A
 skill is a procedure written for a reader — an agent whose CLI never heard of
@@ -15,7 +17,7 @@ markdown at a stable path.
 | Lives in | Holds |
 |---|---|
 | `instructions/*.md` | **Canon** — the rule, the geometry, the rationale. One source of truth. |
-| `skills/wtc-*/SKILL.md` | **Procedure** — what to do, in order, with the judgement calls named. Links to canon rather than restating it. |
+| `wtc-*` skills (CLI defaults, or `skills/wtc-*/SKILL.md` overrides) | **Procedure** — what to do, in order, with the judgement calls named. Links to canon rather than restating it. |
 | `wtc` CLI | **Mechanism** — collection commands and their stable flags. |
 
 A skill that only wraps one command invocation is not worth a file; the value
@@ -37,8 +39,8 @@ one symlink per skill and the collection entry point:
 
 ```text
 <collection>/AGENTS.md              -> harness/collection-AGENTS.md
-<collection>/.claude/skills/wtc-pr  -> ../../harness/skills/wtc-pr
-<collection>/.agents/skills/wtc-pr  -> ../../harness/skills/wtc-pr
+<collection>/.claude/skills/wtc-pr  -> ../../.wtc/skills/wtc-pr        (CLI default)
+<collection>/.agents/skills/wtc-pr  -> ../../.wtc/skills/wtc-pr        (or ../../harness/skills/wtc-pr when overridden)
 <collection>/.grok/hooks/wtc-agent-env.json -> ../../harness/hooks/agent-env.json
 <collection>/.claude/settings.json  -> ../harness/hooks/agent-env.json
 <collection>/.cursor/hooks.json     -> ../harness/hooks/agent-env.json

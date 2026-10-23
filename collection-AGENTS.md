@@ -63,7 +63,7 @@ explicitly. Full rule: `harness/instructions/collection-context.md`.
 - **Skills** are the procedures for recurring collection actions —
   `/wtc-status`, `/wtc-open`, `/wtc-catch-up`, `/wtc-pr`, `/wtc-add-repo`,
   `/wtc-retire`, and `/wtc-start` on a fresh one. Generic procedures ship
-  with the CLI; harness overrides live in `harness/skills/`. `wtc skills render`
+  with the CLI; harness overrides, if any, live in `harness/skills/`. `wtc skills render`
   exposes them at this root. Prefer a skill when one exists.
 - **MCP servers** are declared once in `harness/.mcp-servers.yml` and
   rendered into `.mcp.json`, `.cursor/mcp.json` and `.codex/config.toml` at
@@ -96,7 +96,7 @@ checkpoints before actions that still need authorization. Reuse fresh status
 snapshots instead of repeatedly querying every PR. `/wtc-catch-up` brings
 outside changes in; `/wtc-follow` carries this session's work to its outcome.
 A status-only request remains read-only. Procedure and resumption limits:
-`harness/skills/wtc-follow/SKILL.md`.
+the `wtc-follow` skill.
 
 ## A draft PR is not ready until it has been reviewed
 
