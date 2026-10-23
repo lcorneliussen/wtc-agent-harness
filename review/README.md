@@ -16,7 +16,7 @@ own under `.review/concerns/`.
 
 | Piece | Role |
 |---|---|
-| `skills/wtc-local-review/` | main-thread procedure: bundle → run → read → post → fix → resolve inline threads → re-run |
+| `wtc-local-review` skill | main-thread procedure: bundle → run → read → post → fix → resolve inline threads → re-run |
 | `wtc review bundle` | builds a review bundle (diff, PR text, concerns, downstream snapshots, prior rounds) |
 | `wtc review run` | fans out one headless agent per concern, then one lead pass; writes `summary.md` + `verdict` + per-run stats; `--post` runs the comment lifecycle |
 | `wtc review post` | creates or updates the bundle's one summary comment (bb or gh): `--progress`, final summary, `--failed`; a summary post also adds inline comments |

@@ -2,7 +2,8 @@
 
 The recurring collection actions are packaged as **skills**: `SKILL.md`
 procedure files the agent CLIs discover on their own and load only when a task
-matches. They live in this repo under `skills/`, and are exposed at each
+matches. The generic `wtc-*` skills ship with the pinned CLI; a harness
+override lives in this repo under `skills/`. Both are exposed at each
 collection root by symlink.
 
 Design principle, as everywhere else here: **no tool is load-bearing.** A
