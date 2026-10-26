@@ -1,2 +1,8 @@
 [compatibility]
 requires = ">=0.1.54,<0.2"
+
+[runtime]
+backend = "dekit"
+
+[mise.tools]
+"github:pvolok/dekit" = "0.10.3"
