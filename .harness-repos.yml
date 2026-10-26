@@ -59,3 +59,9 @@ repositories:
     default_ref: origin/main
     port_offset: 2
     role: Docker Compose claw derived from clawfather-boilerplate, public — the OpenClaw gateway for working on wtc, run locally (bin/claw deploy); test bed and wtc integration.
+
+  # OpenClaw integration for Bitbucket Cloud pull requests, reviews and pipelines.
+  - name: openclaw-bitbucket
+    remote: git@github.com:lcorneliussen/openclaw-bitbucket.git
+    default_ref: origin/main
+    role: OpenClaw plugin and skill for Bitbucket Cloud personal logins, pull requests, reviews and pipelines.
