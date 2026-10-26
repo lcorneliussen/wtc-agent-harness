@@ -19,12 +19,6 @@
 #   issues_prefix  only for repos with an in-repo issue tracker. This
 #                  workspace tracks issues on GitHub, so no repo sets one.
 #   role           one line, for humans reading this file
-#
-# wtc-boilerplate — the upstream this harness is a downstream of — is
-# deliberately NOT listed. It joins a collection as an unmanaged `ext.`
-# sibling (instructions/worktree-workspace.md → Unmanaged siblings), owned by
-# an ordinary clone outside the workspace; generic fixes go back to it from
-# there.
 
 schema_version: 1
 
@@ -33,7 +27,7 @@ repositories:
   - name: wtc-agent-harness
     remote: git@github.com:lcorneliussen/wtc-agent-harness.git
     default_ref: origin/main
-    role: Dogfood harness — instructions, registry, collection tools; downstream of wtc-boilerplate.
+    role: Dogfood harness — instructions, registry, collection tools.
 
   # The official Worktree Collections site. Serves HTTP once it has a stack,
   # so it takes the first port offset: WTC_SITE_PORT = base + 1.
@@ -51,8 +45,7 @@ repositories:
     role: The wtc CLI and OpenClaw plugin — what the site describes; its docs/ are the source of truth.
 
   # Public boilerplate for a team OpenClaw server. Downstream derived works
-  # copy it and port upstream changes by hand, like this harness does with
-  # wtc-boilerplate.
+  # copy it and port upstream changes by hand.
   - name: clawfather-boilerplate
     remote: git@github.com:lcorneliussen/clawfather-boilerplate.git
     default_ref: origin/main
