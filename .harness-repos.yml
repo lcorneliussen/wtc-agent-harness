@@ -32,7 +32,7 @@ repositories:
   # The official Worktree Collections site. Serves HTTP once it has a stack,
   # so it takes the first port offset: WTC_SITE_PORT = base + 1.
   - name: wtc-site
-    remote: git@github.com:lcorneliussen/wtc-site.git
+    remote: git@github.com:lcorneliussen/taba-site.git
     default_ref: origin/main
     port_offset: 1
     role: The official wtc site — the product this workspace exists to build; what it says about wtc comes from wtc-cli.
