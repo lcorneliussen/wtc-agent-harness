@@ -32,12 +32,12 @@ jobs:
           case "$(uname -s)" in Darwin) os=darwin ;; Linux) os=linux ;; esac
           case "$(uname -m)" in arm64|aarch64) arch=arm64 ;; x86_64) arch=amd64 ;; esac
           # From 0.2.0 releases ship taba_* archives, which contain wtc as well.
-          gh release download "v${version}" -R lcorneliussen/wtc-cli -p checksums.txt
+          gh release download "v${version}" -R lcorneliussen/taba -p checksums.txt
           for name in taba wtc; do
             asset="${name}_${version}_${os}_${arch}.tar.gz"
             grep -q "  ${asset}$" checksums.txt && break
           done
-          gh release download "v${version}" -R lcorneliussen/wtc-cli -p "$asset"
+          gh release download "v${version}" -R lcorneliussen/taba -p "$asset"
           grep "  ${asset}$" checksums.txt | shasum -a 256 -c -
           mkdir -p "$RUNNER_TEMP/wtc-bin"
           tar -xzf "$asset" -C "$RUNNER_TEMP/wtc-bin" wtc

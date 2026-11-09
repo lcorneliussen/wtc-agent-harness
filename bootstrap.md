@@ -24,7 +24,7 @@ Day-to-day geometry after this: `instructions/worktree-workspace.md`.
 
 ## Dependencies
 
-Install `wtc` from a [published CLI release](https://github.com/lcorneliussen/wtc-cli/releases)
+Install `wtc` from a [published CLI release](https://github.com/lcorneliussen/taba/releases)
 before creating the first collection. After `wtc env setup` generates
 `mise.toml`, `mise install` provides the checked-in pinned version.
 
