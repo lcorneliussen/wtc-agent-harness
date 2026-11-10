@@ -1,5 +1,5 @@
 [compatibility]
-requires = ">=0.1.54,<0.2"
+requires = ">=0.2.0,<0.3"
 
 [runtime]
 backend = "dekit"
