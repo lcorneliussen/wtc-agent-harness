@@ -47,7 +47,8 @@ for command, flags in documented_options.items():
         assert flag in help_text, (command, flag)
 
 for path in [*root.glob("*.md"), *(root / "instructions").glob("*.md"),
-             *(root / "review").glob("*.md"), *(root / "skills").glob("*/SKILL.md")]:
+             *(root / "review").glob("*.md"), *(root / "roles").glob("*.md"),
+             *(root / "skills").glob("*/SKILL.md")]:
     text = path.read_text()
     assert not re.search(r"(?:harness/)?tools/[\w.-]+\.sh", text), path
 

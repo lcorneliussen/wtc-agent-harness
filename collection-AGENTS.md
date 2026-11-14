@@ -43,6 +43,16 @@ also applies to delegated agents and to explanations of a privacy cleanup.
    restrictions are per repo.
 3. **`harness/instructions/`** — geometry, branch policy, secrets, skills.
 
+## Coordinator role
+
+When the user asks “you are a coordinator; get going” or otherwise explicitly
+assigns coordination, use `taba-coordinate` and read
+`harness/roles/coordinator.md`. That role works for any agent client; clients
+without skill discovery read the same Markdown directly. The collection's
+`WTC-SCOPE.md` supplies the current objective, authority, holds and continuation
+pointers. A role invocation does not revive completed tasks or grant new merge,
+release or retirement authority. Other sessions remain ordinary task sessions.
+
 ## Stay in this collection
 
 Your working set is this collection root: `harness/` and the repo siblings
