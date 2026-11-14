@@ -149,14 +149,14 @@ product repo, which is exactly the coupling this layout avoids.
    down are the ones with a decision in them — and the point at which the
    decision stops being the agent's (merging, force-pushing, killing a live
    pane).
-7. **Keep the `wtc-` prefix.** It groups them in `/`-autocomplete and keeps
-   them from colliding with skills a product repo defines for itself.
+7. **Use the `taba-` prefix for new skills; retain existing `wtc-` names.**
+   This groups them in `/`-autocomplete and avoids product skill collisions.
 
 ## Adding one
 
 ```bash
-mkdir -p skills/wtc-<name>
-$EDITOR skills/wtc-<name>/SKILL.md     # frontmatter: name + description
+mkdir -p skills/taba-<name>
+$EDITOR skills/taba-<name>/SKILL.md     # frontmatter: name + description
 wtc skills render                   # link it into this collection
 ```
 

@@ -61,9 +61,12 @@ different revision, with no clone duplication and no branch contention.
   and never valued there, and what is deliberately *not* an MCP server.
 - **`instructions/jira.md`** — a worked example of wiring one external
   tracker; ignore it if yours is not Atlassian.
-- **`skills/`** — harness overrides of the agent-facing procedures. The
+- **[Coordinator role](roles/coordinator.md)** — opt-in orchestration, current
+  scope, visible ownership and delivery. Say “you are a coordinator; get going”
+  in a collection with its current goal recorded in `WTC-SCOPE.md`.
+- **`skills/`** — harness additions and overrides of agent-facing procedures. The
   `wtc-*` skills (`wtc-new`, `wtc-open`, `wtc-catch-up`, `wtc-pr`, …) ship with
-  the pinned CLI; this harness currently overrides none of them.
+  the pinned CLI; this harness adds `taba-coordinate` without overriding them.
 - **`tests/`** — checks for the pinned CLI command surface, agent hooks, and
   publication guard. `tests/README.md` shows how to run them.
 
